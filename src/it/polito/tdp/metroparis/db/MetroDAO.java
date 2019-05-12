@@ -40,6 +40,79 @@ public class MetroDAO {
 
 		return fermate;
 	}
+	
+	
+	/*Questo metodo è corretto, ma molto lento poichè si devono fare vertici^2 query.*/
+	public boolean esisteConnessione(Fermata partenza, Fermata arrivo) {
+		String sql = "SELECT COUNT(*) AS cnt "+
+				"FROM connessione "+
+				"WHERE id_stazP = ? "+
+				"AND id_stazA = ? ";
+		
+		Connection conn = DBConnect.getConnection();
+		PreparedStatement st;
+		try {
+			st = conn.prepareStatement(sql);
+			st.setInt(1,  partenza.getIdFermata());
+			st.setInt(2,  arrivo.getIdFermata());
+			
+			ResultSet rs = st.executeQuery();
+			
+			//mi posiziono sulla prima (e unica) riga
+			rs.next();
+			
+			int numero = rs.getInt("cnt");
+			
+			conn.close();
+			
+			return (numero > 0);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+		
+	}
+	
+	
+	public List<Fermata> stazioniArrivo(Fermata partenza) {
+		String sql = "SELECT id_stazA "+
+				"FROM connessione "+
+				"WHERE id_stazP = ? ";
+		
+		Connection conn = DBConnect.getConnection();
+		PreparedStatement st;
+		try {
+			st = conn.prepareStatement(sql);
+			st.setInt(1,  partenza.getIdFermata());
+			
+			ResultSet rs = st.executeQuery();
+			
+			List<Fermata> result = new ArrayList<>();
+			
+			while(rs.next()) {
+				
+			/*GLI PASSO UNA FERMATA FINTA (non ho i dati per passare tutta la fermata).
+			 * --> l'unico campo necessario per riempire il grafo è l'id (con cui faccio l'equals)
+			 * ed è anche l'unico dato che riesco semplicemente a ricavare con la query.*/	
+				
+				result.add(new Fermata(rs.getInt("id_stazA"), null, null));
+			}
+			
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	
+	
+	
 
 	public List<Linea> getAllLinee() {
 		final String sql = "SELECT id_linea, nome, velocita, intervallo FROM linea ORDER BY nome ASC";

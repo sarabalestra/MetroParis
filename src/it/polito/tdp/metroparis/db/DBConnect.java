@@ -15,6 +15,8 @@ public class DBConnect {
 
 	private static final String jdbcURL = "jdbc:mysql://localhost/metroparis?serverTimezone=UTC";
 	private static HikariDataSource ds;
+	
+
 
 	public static Connection getConnection() {
 
@@ -24,7 +26,7 @@ public class DBConnect {
 
 			ds.setJdbcUrl(jdbcURL);
 			ds.setUsername("root");
-			ds.setPassword("root");
+			ds.setPassword("msb2");
 
 			// configurazione MySQL
 			ds.addDataSourceProperty("cachePrepStmts", "true");
